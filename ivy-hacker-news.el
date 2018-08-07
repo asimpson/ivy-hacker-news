@@ -35,8 +35,8 @@
     (ivy-read "Hackernews: " (reverse (seq-uniq links))
               :action (lambda(link) (browse-url (plist-get (cdr link) :link))))))
 
-         (ivy-set-actions 'hacker-news
-                          '(("c" (lambda(item) (browse-url (plist-get (cdr item) :id))) "Jump to comments")))))
+(ivy-set-actions 'ivy-hacker-news
+                 '(("c" (lambda(item) (browse-url (plist-get (cdr item) :id))) "Jump to comments")))
 
 (provide 'ivy-hacker-news)
 
