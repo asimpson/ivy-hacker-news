@@ -2,7 +2,7 @@
 ;; -*- lexical-binding: t; -*-
 
 ;; Adam Simpson <adam@adamsimpson.net>
-;; Version: 0.0.1
+;; Version: 0.1.1
 ;; Package-Requires: ((pinboard-popular "0.1.2") (loop "1.4") (ivy "9.0"))
 ;; Keywords: hackernews
 
@@ -27,7 +27,7 @@
           (push (let (title link id)
                   (when (ignore-errors (re-search-forward "storylink"))
                     (re-search-backward "<")
-                    (setq link (substring (pinboard-popular--re-capture-between "href=" "/") 0 -1))
+                    (setq link (substring (pinboard-popular--re-capture-between "href=\\\"" "\\\"") 0 -1))
                     (setq title (decode-coding-string (substring (pinboard-popular--re-capture-between ">" "<") 0 -1) 'utf-8))
                     (move-beginning-of-line nil)
                     (setq id (concat "https://news.ycombinator.com/item?id=" (buffer-substring-no-properties (re-search-forward "up_") (- (re-search-forward "'") 1))))
@@ -36,7 +36,8 @@
               :action (lambda(link) (browse-url (plist-get (cdr link) :link))))))
 
 (ivy-set-actions 'ivy-hacker-news
-                 '(("c" (lambda(item) (browse-url (plist-get (cdr item) :id))) "Jump to comments")))
+                 '(("c" (lambda(item) (browse-url (plist-get (cdr item) :id))) "Jump to comments")
+                   ("v" (lambda(item) (eww (plist-get (cdr item) :link))) "View in Emacs")))
 
 (provide 'ivy-hacker-news)
 
