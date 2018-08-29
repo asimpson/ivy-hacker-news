@@ -2,7 +2,7 @@
 ;; -*- lexical-binding: t; -*-
 
 ;; Adam Simpson <adam@adamsimpson.net>
-;; Version: 0.1.1
+;; Version: 0.2.0
 ;; Package-Requires: ((pinboard-popular "0.1.2") (loop "1.4") (ivy "9.0"))
 ;; Keywords: hackernews
 
@@ -13,6 +13,11 @@
 (require 'loop)
 (require 'ivy)
 (require 'pinboard-popular)
+
+(defun ivy-hacker-news--fetch-pinboard-token()
+  "Return the pinboard API token from auth-source."
+  (let ((entry (auth-source-search :host "pinboard.in" :max 1)))
+    (funcall (plist-get (car entry) :secret))))
 
 ;;;###autoload
 (defun ivy-hacker-news()
@@ -37,6 +42,16 @@
 
 (ivy-set-actions 'ivy-hacker-news
                  '(("c" (lambda(item) (browse-url (plist-get (cdr item) :id))) "Jump to comments")
+                   ("r" (lambda (item)
+                          (url-retrieve-synchronously (concat "https://api.pinboard.in/v1/posts/add?auth_token="
+                                                              (ivy-hacker-news--fetch-pinboard-token)
+                                                              "&url="
+                                                              (plist-get (cdr item) :link)
+                                                              "&description="
+                                                              (plist-get (cdr item) :title)
+                                                              "&extended="
+                                                              (concat "HN comments: " (plist-get (cdr item) :id))
+                                                              "&toread=yes"))) "Save as unread in pinboard")
                    ("v" (lambda(item) (eww (plist-get (cdr item) :link))) "View in Emacs")))
 
 (provide 'ivy-hacker-news)
